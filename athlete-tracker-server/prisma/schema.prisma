@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String   @id @default(uuid())
+  email    String   @unique
+  password String
+  name     String
+  createdAt DateTime @default(now())
+
+  profile      UserProfile?
+  weightLogs   WeightLog[]
+  workouts     Workout[]
+  meals        Meal[]
+  goals        Goal[]
+  achievements UserAchievement[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model UserProfile {
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  birthDate      DateTime
+  sex            String
+  weightKg       Float
+  heightCm       Float
+  activityLevel  String
+  nutritionMode  String
+
+  bmr              Int?
+  tdee             Int?
+  targetCalories   Int?
+  profileCompleted Boolean  @default(false)
+  updatedAt        DateTime @updatedAt
+}
+
+model WeightLog {
+  id         String   @id @default(uuid())
+  weightKg   Float
+  recordedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId, recordedAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([userId])
+}
+
+model Workout {
+  id        String   @id @default(uuid())
+  type      String
+  duration  Int
+  intensity Int
+  date      DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+}
+
+model Meal {
+  id        String   @id @default(uuid())
+  type      String
+  calories  Int
+  date      DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+}
+
+model Goal {
+  id     String @id @default(uuid())
+  type   String
+  target Int
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+}
+
+model Achievement {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  condition   String @unique
+  sortOrder   Int    @default(0)
+  category    String @default("general")
+
+  users UserAchievement[]
+}
+
+model UserAchievement {
+  id         String   @id @default(uuid())
+  unlockedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  achievementId String
+}
