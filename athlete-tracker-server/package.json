@@ -9,6 +9,7 @@
     "test": "node --test src/lib/nutrition/calorieTargets.test.js",
     "seed": "node prisma/seed.js",
     "db:migrate": "prisma migrate deploy",
+    "db:sync:turso": "node scripts/sync-turso.mjs",
     "db:reset": "prisma migrate reset --force",
     "postinstall": "prisma generate"
   },

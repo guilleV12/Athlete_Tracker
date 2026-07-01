@@ -46,18 +46,12 @@ turso db tokens create athlete-tracker
 
 ```bash
 cd athlete-tracker-server
-
-# Windows PowerShell — reemplazá con tus valores reales
-$env:TURSO_DATABASE_URL="libsql://..."
-$env:TURSO_AUTH_TOKEN="..."
-$env:DATABASE_URL="file:./dev.db"
-
 npm install
-npx prisma db push
+npm run db:sync:turso
 npm run seed
 ```
 
-> `prisma db push` sincroniza el schema con Turso. El seed crea logros + usuario demo.
+> `db:sync:turso` aplica las migraciones SQL a Turso (Prisma CLI solo escribe en SQLite local). El seed crea logros + usuario demo. Requiere `TURSO_*` en `.env`.
 
 Credenciales demo: `demo@athlete-tracker.dev` / `Demo1234`
 
@@ -115,9 +109,11 @@ Vercel usa el `vercel.json` de la raíz (cliente + función `/api`).
 
 | Síntoma | Solución |
 |---------|----------|
+| "No se pudo conectar con el servidor" | Ver filas de abajo. |
+| `/api/v1/health` devuelve HTML (no JSON) | La API no está deployada. Redeploy con Root Directory `.` o `athlete-tracker-client` y el `vercel.json` del repo. |
 | Requests a `localhost:3000` | Redeploy en Vercel (build viejo). El cliente ya usa `/api/v1` en prod. |
 | 500 en `/api/v1/*` | Revisá `TURSO_*`, `JWT_SECRET` y logs en Vercel → Functions. |
-| Tablas vacías / demo no existe | Corré `npx prisma db push` y `npm run seed` contra Turso (paso 1). |
+| Turso 401 / tablas vacías | Regenerá el token en Turso (`turso db tokens create`) y corré `npm run db:sync:turso` + `npm run seed`. |
 | Prisma client error | El build ejecuta `prisma generate` vía `postinstall` del server. |
 | CORS | Con mismo dominio no debería aparecer. Si usás dominio custom, actualizá `FRONTEND_URL`. |
 
