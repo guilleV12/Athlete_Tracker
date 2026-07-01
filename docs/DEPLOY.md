@@ -59,15 +59,19 @@ Credenciales demo: `demo@athlete-tracker.dev` / `Demo1234`
 
 ## 2. Proyecto en Vercel
 
-1. [vercel.com](https://vercel.com) → **Add New** → **Project** → importá `Athlete_Tracker`.
-2. Configuración:
+1. [vercel.com](https://vercel.com) → tu proyecto → **Settings** → **General** → **Build & Development Settings**.
+
+2. Configuración (**importante: desactivá overrides viejos**):
 
 | Campo | Valor |
 |--------|--------|
-| Root Directory | `.` (raíz del repo) |
-| Framework Preset | Other |
+| Root Directory | `.` (raíz del repo, **no** `athlete-tracker-client`) |
+| Framework Preset | **Other** |
+| Build Command | **vacío** |
+| Install Command | **vacío** |
+| Output Directory | **vacío** (Vercel usa `dist` vía `vercel.json`) |
 
-Vercel usa el `vercel.json` de la raíz (cliente + función `/api`).
+> Si ves `exited with 127` o `No Output Directory named "dist"`, borrá overrides viejos en el dashboard y asegurate que Root Directory sea `.`.
 
 3. **Environment Variables** (Production):
 
@@ -110,7 +114,9 @@ Vercel usa el `vercel.json` de la raíz (cliente + función `/api`).
 | Síntoma | Solución |
 |---------|----------|
 | "No se pudo conectar con el servidor" | Ver filas de abajo. |
-| `/api/v1/health` devuelve HTML (no JSON) | La API no está deployada. Redeploy con Root Directory `.` o `athlete-tracker-client` y el `vercel.json` del repo. |
+| Build `exited with 127` | Vercel → Settings → **Build Command vacío**. Root Directory = `.`. Redeploy. |
+| `No Output Directory named "dist"` | Root Directory = `.` (raíz). Output Directory **vacío** en dashboard. Redeploy. |
+| `/api/v1/health` devuelve HTML (no JSON) | Root Directory debe ser `.` y el `vercel.json` de la raíz deployado. Redeploy. |
 | Requests a `localhost:3000` | Redeploy en Vercel (build viejo). El cliente ya usa `/api/v1` en prod. |
 | 500 en `/api/v1/*` | Revisá `TURSO_*`, `JWT_SECRET` y logs en Vercel → Functions. |
 | Turso 401 / tablas vacías | Regenerá el token en Turso (`turso db tokens create`) y corré `npm run db:sync:turso` + `npm run seed`. |

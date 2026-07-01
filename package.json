@@ -10,6 +10,10 @@
     "build:client": "npm run build --workspace=athlete-tracker-client",
     "build:server": "npm run postinstall --workspace=athlete-tracker-server",
     "build": "npm run build:server && npm run build:client",
+    "vercel-build": "npm run build",
     "seed": "npm run seed --workspace=athlete-tracker-server"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
