@@ -3,7 +3,8 @@ import { AUTH_TOKEN_KEY } from "../lib/authSession.js";
 import { emitSessionExpired } from "../lib/authEvents.js";
 
 const rawBase =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+  import.meta.env.VITE_API_URL ??
+  (import.meta.env.PROD ? "/api/v1" : "http://localhost:3000/api/v1");
 const baseURL = String(rawBase).replace(/\/$/, "");
 
 const api = axios.create({

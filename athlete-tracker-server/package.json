@@ -20,6 +20,8 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@libsql/client": "^0.15.15",
+    "@prisma/adapter-libsql": "^6.19.3",
     "@prisma/client": "^6.19.3",
     "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.104.0",

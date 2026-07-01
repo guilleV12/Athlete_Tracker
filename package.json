@@ -1,0 +1,15 @@
+{
+  "name": "athlete-tracker",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "athlete-tracker-client",
+    "athlete-tracker-server"
+  ],
+  "scripts": {
+    "build:client": "npm run build --workspace=athlete-tracker-client",
+    "build:server": "npm run postinstall --workspace=athlete-tracker-server",
+    "build": "npm run build:server && npm run build:client",
+    "seed": "npm run seed --workspace=athlete-tracker-server"
+  }
+}

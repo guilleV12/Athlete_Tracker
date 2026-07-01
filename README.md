@@ -130,31 +130,22 @@ VITE_API_URL=http://localhost:3000/api/v1
 
 ## Deploy (portfolio)
 
-### Frontend → Vercel
+Todo en **un solo proyecto Vercel**: frontend + API (`/api/v1/*`). Base de datos en **Turso** (gratis).
 
-El repo es un **monorepo**: el cliente está en `athlete-tracker-client/`. Hay un `vercel.json` en la raíz que apunta ahí.
+Guía paso a paso: [`docs/DEPLOY.md`](docs/DEPLOY.md)
 
-1. Root Directory: **`.`** (raíz) o **`athlete-tracker-client`** (ver [`docs/DEPLOY.md`](docs/DEPLOY.md))
-2. Variable: `VITE_API_URL=https://tu-api.onrender.com/api/v1`
-3. `vercel.json` incluido para rutas SPA
+Resumen:
 
-### API → Render
-
-1. Conectá el repo y usá `render.yaml` (Blueprint) o configurá manualmente:
-   - Root: `athlete-tracker-server`
-   - Build: `npm install && npx prisma migrate deploy && npm run seed`
-   - Start: `npm start`
-2. Variables: `JWT_SECRET`, `FRONTEND_URL` (URL de Vercel), `DATABASE_URL`
-3. **Nota:** SQLite en Render usa disco efímero; para demo alcanza. Para producción real conviene **PostgreSQL** (cambiar `provider` en Prisma).
+1. Crear base en [Turso](https://turso.tech) → `TURSO_DATABASE_URL` + `TURSO_AUTH_TOKEN`
+2. Vercel → importar repo, Root Directory `.`, variables de entorno
+3. `prisma db push` + `npm run seed` contra Turso (usuario demo)
+4. Deploy — la app llama a `/api/v1` en el mismo dominio (sin CORS)
 
 ### Checklist post-deploy
 
-Ver guía detallada: [`docs/DEPLOY.md`](docs/DEPLOY.md)
-
-- [ ] `FRONTEND_URL` apunta al dominio del cliente
-- [ ] `VITE_API_URL` apunta al dominio de la API
-- [ ] Seed ejecutado (`demo@athlete-tracker.dev` / `Demo1234`)
-- [ ] Probar login y dashboard
+- [ ] `GET .../api/v1/health` responde OK
+- [ ] Login demo (`demo@athlete-tracker.dev` / `Demo1234`)
+- [ ] Registro y dashboard funcionan
 
 ---
 
@@ -162,9 +153,10 @@ Ver guía detallada: [`docs/DEPLOY.md`](docs/DEPLOY.md)
 
 ```
 app-athlete-tracker/
+├── api/                      # Entrada serverless Vercel (Express)
 ├── athlete-tracker-client/   # React SPA
 ├── athlete-tracker-server/   # Express API + Prisma
-├── render.yaml               # Blueprint Render (API)
+├── vercel.json               # Deploy monorepo (cliente + API)
 └── README.md
 ```
 

@@ -1,8 +1,18 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "npm install --prefix athlete-tracker-client",
-  "buildCommand": "npm run build --prefix athlete-tracker-client",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
   "outputDirectory": "athlete-tracker-client/dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  },
+  "rewrites": [
+    { "source": "/api/v1/(.*)", "destination": "/api" },
+    { "source": "/api", "destination": "/api" },
+    { "source": "/((?!api).*)", "destination": "/index.html" }
+  ]
 }
