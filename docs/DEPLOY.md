@@ -48,7 +48,7 @@ Repo actual: `https://github.com/guilleV12/Athlete_Tracker`
 | `NODE_ENV` | `production` |
 | `DATABASE_URL` | `file:./dev.db` |
 | `JWT_SECRET` | Generá uno largo (Render puede auto-generar) |
-| `FRONTEND_URL` | URL de Vercel (paso 2) |
+| `FRONTEND_URL` | `https://athlete-tracker-gray.vercel.app` |
 
 5. **Deploy**. Cuando termine, copiá la URL de la API, ej.:
    `https://athlete-tracker-api.onrender.com`

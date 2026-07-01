@@ -19,7 +19,7 @@ import PasswordField from "../components/ui/PasswordField";
 export default function RegisterPage() {
   const navigate = useNavigate();
   const { login, user, token, loading: authLoading } = useAuth();
-  const { success } = useToast();
+  const { success, error: toastError } = useToast();
   const [apiError, setApiError] = useState("");
 
   const {
@@ -55,7 +55,9 @@ export default function RegisterPage() {
       );
       navigate(getPostAuthNavigation(data.user, { from: "register" }));
     } catch (error) {
-      setApiError(getApiErrorMessage(error, "Error al registrar usuario."));
+      const message = getApiErrorMessage(error, "Error al registrar usuario.");
+      setApiError(message);
+      toastError(message);
     }
   };
 
