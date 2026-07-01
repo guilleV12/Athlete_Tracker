@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm install --prefix athlete-tracker-client",
+  "buildCommand": "npm run build --prefix athlete-tracker-client",
+  "outputDirectory": "athlete-tracker-client/dist",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}

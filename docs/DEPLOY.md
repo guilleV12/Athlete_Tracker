@@ -74,13 +74,21 @@ Credenciales: `demo@athlete-tracker.dev` / `Demo1234`
 
 1. Entrá a [vercel.com](https://vercel.com) → **Add New** → **Project**.
 2. Importá el repo `Athlete_Tracker`.
-3. Configuración:
+3. Configuración (**elegí una**):
+
+**A) Recomendado — monorepo desde la raíz** (usa `/vercel.json` del repo):
 
 | Campo | Valor |
 |--------|--------|
-| Framework Preset | Vite |
+| Root Directory | `.` (raíz del repo, vacío) |
+| Framework Preset | Other |
+
+**B) Alternativa — solo la carpeta del cliente:**
+
+| Campo | Valor |
+|--------|--------|
 | Root Directory | `athlete-tracker-client` |
-| Build Command | `npm run build` |
+| Framework Preset | Vite |
 | Output Directory | `dist` |
 
 4. **Environment Variables:**

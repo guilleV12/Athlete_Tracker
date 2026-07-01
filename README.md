@@ -132,11 +132,11 @@ VITE_API_URL=http://localhost:3000/api/v1
 
 ### Frontend → Vercel
 
-1. Root directory: `athlete-tracker-client`
-2. Build: `npm run build`
-3. Output: `dist`
-4. Variable: `VITE_API_URL=https://tu-api.onrender.com/api/v1`
-5. `vercel.json` incluido para rutas SPA
+El repo es un **monorepo**: el cliente está en `athlete-tracker-client/`. Hay un `vercel.json` en la raíz que apunta ahí.
+
+1. Root Directory: **`.`** (raíz) o **`athlete-tracker-client`** (ver [`docs/DEPLOY.md`](docs/DEPLOY.md))
+2. Variable: `VITE_API_URL=https://tu-api.onrender.com/api/v1`
+3. `vercel.json` incluido para rutas SPA
 
 ### API → Render
 
