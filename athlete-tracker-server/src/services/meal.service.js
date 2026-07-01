@@ -1,20 +1,22 @@
 import { prisma } from "../lib/prisma.js";
+import { validateMealMacros } from "../lib/nutrition/macros.js";
 
 export const createMeal = async (data, userId) => {
-    const { type, calories } = data;
+    const { type } = data;
 
-    if (!type || !calories) {
+    if (!type?.trim()) {
         throw new Error("All fields are required");
     }
 
-    if (calories < 0) {
-        throw new Error("Calories cannot be negative");
-    }
+    const { proteinG, carbsG, fatG, calories } = validateMealMacros(data);
 
     const meal = await prisma.meal.create({
         data: {
-            type,
+            type: type.trim(),
             calories,
+            proteinG,
+            carbsG,
+            fatG,
             userId,
         },
     });

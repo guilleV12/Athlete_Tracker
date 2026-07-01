@@ -11,7 +11,10 @@ import FormField, { fieldInputClass } from "../components/ui/FormField";
 import WeightHistoryChart from "../components/profile/WeightHistoryChart";
 import WeightQuickLog from "../components/profile/WeightQuickLog";
 import ProfileOnboardingBanner from "../components/profile/ProfileOnboardingBanner";
+import ProfileMacroTargetsSection from "../components/profile/ProfileMacroTargetsSection";
+import { MacroTargetsSummary } from "../components/nutrition/MacroSummary";
 import { notifyNewAchievements } from "../lib/achievementNotifications";
+import { DASHBOARD_PATH } from "../lib/routes";
 
 const ACTIVITY_OPTIONS = [
   { value: "sedentary", label: "Sedentario" },
@@ -49,6 +52,29 @@ function toDateInputValue(iso) {
   return iso.slice(0, 10);
 }
 
+function macroFieldsFromProfile(macroTargets) {
+  if (!macroTargets) {
+    return { targetProteinG: "", targetCarbsG: "", targetFatG: "" };
+  }
+  return {
+    targetProteinG: macroTargets.proteinG,
+    targetCarbsG: macroTargets.carbsG,
+    targetFatG: macroTargets.fatG,
+  };
+}
+
+function profileToFormValues(profile) {
+  return {
+    birthDate: toDateInputValue(profile.birthDate),
+    sex: profile.sex,
+    weightKg: profile.weightKg,
+    heightCm: profile.heightCm,
+    activityLevel: profile.activityLevel,
+    nutritionMode: profile.nutritionMode,
+    ...macroFieldsFromProfile(profile.macroTargets),
+  };
+}
+
 export default function ProfilePage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -66,12 +92,15 @@ export default function ProfilePage() {
   const [weightHistory, setWeightHistory] = useState([]);
   const [hasProfile, setHasProfile] = useState(false);
   const [currentWeightKg, setCurrentWeightKg] = useState(null);
+  const [macroTargets, setMacroTargets] = useState(null);
+  const [suggestedMacros, setSuggestedMacros] = useState(null);
 
   const {
     register,
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(profileSchema),
@@ -82,6 +111,9 @@ export default function ProfilePage() {
       heightCm: "",
       activityLevel: "moderate",
       nutritionMode: "maintenance",
+      targetProteinG: "",
+      targetCarbsG: "",
+      targetFatG: "",
     },
     mode: "onTouched",
   });
@@ -98,13 +130,13 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!loading && showOnboarding && hasProfile) {
-      navigate("/", { replace: true });
+      navigate(DASHBOARD_PATH, { replace: true });
     }
   }, [loading, showOnboarding, hasProfile, navigate]);
 
   const dismissOnboarding = () => {
     setShowOnboarding(false);
-    navigate("/");
+    navigate(DASHBOARD_PATH);
   };
 
   const firstName = user?.name?.trim().split(/\s+/)[0] ?? "";
@@ -118,15 +150,10 @@ export default function ProfilePage() {
         const data = await fetchProfile();
         if (cancelled) return;
         if (data.profile) {
-          reset({
-            birthDate: toDateInputValue(data.profile.birthDate),
-            sex: data.profile.sex,
-            weightKg: data.profile.weightKg,
-            heightCm: data.profile.heightCm,
-            activityLevel: data.profile.activityLevel,
-            nutritionMode: data.profile.nutritionMode,
-          });
+          reset(profileToFormValues(data.profile));
           setPreview(data.computed);
+          setMacroTargets(data.profile.macroTargets ?? null);
+          setSuggestedMacros(data.computed?.suggestedMacros ?? null);
           setWeightHistory(data.weightHistory ?? []);
           setHasProfile(true);
           setCurrentWeightKg(data.profile.weightKg);
@@ -153,24 +180,19 @@ export default function ProfilePage() {
     try {
       const data = await saveProfile(values);
       setPreview(data.computed);
+      setMacroTargets(data.profile?.macroTargets ?? null);
+      setSuggestedMacros(data.computed?.suggestedMacros ?? null);
       setWeightHistory(data.weightHistory ?? []);
       setHasProfile(true);
       setCurrentWeightKg(data.profile?.weightKg ?? values.weightKg);
-      reset({
-        birthDate: toDateInputValue(data.profile.birthDate),
-        sex: data.profile.sex,
-        weightKg: data.profile.weightKg,
-        heightCm: data.profile.heightCm,
-        activityLevel: data.profile.activityLevel,
-        nutritionMode: data.profile.nutritionMode,
-      });
+      reset(profileToFormValues(data.profile));
       patchUser({ profileCompleted: true });
       const wasOnboarding = showOnboarding;
       setShowOnboarding(false);
       toastApi.success("Perfil guardado. Tus metas calóricas están listas.");
       notifyNewAchievements(toastApi, data.newAchievements);
       if (wasOnboarding) {
-        navigate("/", { replace: true });
+        navigate(DASHBOARD_PATH, { replace: true });
       }
     } catch (err) {
       setApiError(getApiErrorMessage(err, "No se pudo guardar el perfil."));
@@ -183,14 +205,9 @@ export default function ProfilePage() {
     if (data.profile) {
       setHasProfile(true);
       setCurrentWeightKg(data.profile.weightKg);
-      reset({
-        birthDate: toDateInputValue(data.profile.birthDate),
-        sex: data.profile.sex,
-        weightKg: data.profile.weightKg,
-        heightCm: data.profile.heightCm,
-        activityLevel: data.profile.activityLevel,
-        nutritionMode: data.profile.nutritionMode,
-      });
+      setMacroTargets(data.profile.macroTargets ?? null);
+      setSuggestedMacros(data.computed?.suggestedMacros ?? null);
+      reset(profileToFormValues(data.profile));
     }
   };
 
@@ -375,6 +392,14 @@ export default function ProfilePage() {
             ) : null}
           </section>
 
+          <ProfileMacroTargetsSection
+            register={register}
+            errors={errors}
+            watched={watched}
+            setValue={setValue}
+            suggestedMacros={suggestedMacros}
+          />
+
           {hasProfile ? (
             <section className="quest-card space-y-4 p-5 sm:p-6">
               <div>
@@ -433,6 +458,17 @@ export default function ProfilePage() {
                     : "Sin meta (comer libre)"}
                 </li>
               </ul>
+              {macroTargets ? (
+                <MacroTargetsSummary
+                  targets={macroTargets}
+                  className="mt-4 border-t border-[var(--border)] pt-4"
+                />
+              ) : (
+                <p className="mt-4 border-t border-[var(--border)] pt-4 text-xs text-[var(--text)]">
+                  Sin metas de macros guardadas. Completalas arriba y guardá el
+                  perfil.
+                </p>
+              )}
             </section>
           ) : (
             <p className="text-center text-sm text-[var(--text)]">

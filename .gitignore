@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+
+# Build
+dist/
+build/
+
+# Prisma (server path)
+athlete-tracker-server/prisma/dev.db
+athlete-tracker-server/prisma/dev.db-journal

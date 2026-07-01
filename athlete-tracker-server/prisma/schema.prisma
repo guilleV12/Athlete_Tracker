@@ -43,6 +43,9 @@ model UserProfile {
   bmr              Int?
   tdee             Int?
   targetCalories   Int?
+  targetProteinG   Int?
+  targetCarbsG     Int?
+  targetFatG       Int?
   profileCompleted Boolean  @default(false)
   updatedAt        DateTime @updatedAt
 }
@@ -85,6 +88,9 @@ model Meal {
   id        String   @id @default(uuid())
   type      String
   calories  Int
+  proteinG  Int      @default(0)
+  carbsG    Int      @default(0)
+  fatG      Int      @default(0)
   date      DateTime @default(now())
 
   user   User   @relation(fields: [userId], references: [id])

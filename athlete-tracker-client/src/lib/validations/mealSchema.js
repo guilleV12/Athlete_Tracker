@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { caloriesFromMacros } from "../nutrition/macroUtils";
 
 export const MEAL_TYPES = [
   "Desayuno",
@@ -9,6 +10,12 @@ export const MEAL_TYPES = [
   "Otro",
 ];
 
+const macroGramSchema = z.coerce
+  .number({ invalid_type_error: "Ingresá gramos válidos" })
+  .int("Usá gramos enteros")
+  .min(0, "Mínimo 0 g")
+  .max(500, "Máximo 500 g");
+
 export const mealSchema = z
   .object({
     mealType: z
@@ -18,13 +25,9 @@ export const mealSchema = z
         message: "Tipo de comida inválido",
       }),
     customMealType: z.string().optional(),
-    calories: z.coerce
-      .number({
-        invalid_type_error: "Las calorías deben ser un número",
-      })
-      .int("Usá kcal enteras")
-      .min(50, "Mínimo 50 kcal")
-      .max(10000, "Máximo 10.000 kcal"),
+    proteinG: macroGramSchema,
+    carbsG: macroGramSchema,
+    fatG: macroGramSchema,
   })
   .superRefine((data, ctx) => {
     if (data.mealType !== "Otro") return;
@@ -43,6 +46,22 @@ export const mealSchema = z
         message: "Máximo 40 caracteres",
       });
     }
+
+    const kcal = caloriesFromMacros(data.proteinG, data.carbsG, data.fatG);
+    if (kcal < 50) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["proteinG"],
+        message: "Los macros deben sumar al menos 50 kcal",
+      });
+    }
+    if (kcal > 10000) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["proteinG"],
+        message: "Máximo 10.000 kcal por comida",
+      });
+    }
   });
 
 export function toMealPayload(data) {
@@ -51,11 +70,18 @@ export function toMealPayload(data) {
       ? data.customMealType.trim()
       : data.mealType;
 
-  return { type, calories: data.calories };
+  const proteinG = data.proteinG;
+  const carbsG = data.carbsG;
+  const fatG = data.fatG;
+  const calories = caloriesFromMacros(proteinG, carbsG, fatG);
+
+  return { type, proteinG, carbsG, fatG, calories };
 }
 
 export const mealDefaultValues = {
   mealType: "",
   customMealType: "",
-  calories: "",
+  proteinG: "",
+  carbsG: "",
+  fatG: "",
 };

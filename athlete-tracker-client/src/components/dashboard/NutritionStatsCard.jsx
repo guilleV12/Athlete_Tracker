@@ -1,4 +1,5 @@
 import StatsCard from "./StatsCard";
+import MacroSummary from "../nutrition/MacroSummary";
 
 export default function NutritionStatsCard({ nutrition }) {
   if (!nutrition?.profileCompleted) {
@@ -11,7 +12,8 @@ export default function NutritionStatsCard({ nutrition }) {
     );
   }
 
-  const { consumed, targetCalories, modeLabel, onTarget, remaining } = nutrition;
+  const { consumed, targetCalories, modeLabel, onTarget, remaining, macros } =
+    nutrition;
 
   if (targetCalories == null) {
     return (
@@ -57,6 +59,13 @@ export default function NutritionStatsCard({ nutrition }) {
             ? `Te faltan ${remaining} kcal (${modeLabel}).`
             : `Superaste la meta por ${Math.abs(remaining)} kcal.`}
       </p>
+      <MacroSummary macros={macros} className="mt-4 border-t border-[var(--border)] pt-4" />
+      {!macros?.configured ? (
+        <p className="mt-3 text-xs text-[var(--text)]">
+          Definí metas P/C/G en tu perfil y cargá macros en cada comida para ver
+          el progreso.
+        </p>
+      ) : null}
     </article>
   );
 }

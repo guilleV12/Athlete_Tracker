@@ -1,4 +1,9 @@
 import { prisma } from "../lib/prisma.js";
+import {
+    buildMacroProgress,
+    mapMacroTargets,
+    sumMealMacros,
+} from "../lib/nutrition/macros.js";
 import { isCaloriesOnTarget, NUTRITION_MODE_LABELS } from "../lib/nutrition/calorieTargets.js";
 
 export const getDashboardStats = async (userId) => {
@@ -78,9 +83,13 @@ export const getDashboardStats = async (userId) => {
         consumed: totalCalories,
         remaining: null,
         onTarget: false,
+        macros: null,
     };
 
     if (profile?.profileCompleted) {
+        const macroTargets = mapMacroTargets(profile);
+        const consumedMacros = sumMealMacros(todayMeals);
+
         nutrition = {
             profileCompleted: true,
             mode: profile.nutritionMode,
@@ -92,6 +101,7 @@ export const getDashboardStats = async (userId) => {
                     ? profile.targetCalories - totalCalories
                     : null,
             onTarget: isCaloriesOnTarget(totalCalories, profile.targetCalories),
+            macros: buildMacroProgress(consumedMacros, macroTargets),
         };
     }
 

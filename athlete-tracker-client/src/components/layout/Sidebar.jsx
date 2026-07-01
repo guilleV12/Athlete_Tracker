@@ -8,20 +8,15 @@ import {
     X,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { DASHBOARD_PATH } from "../../lib/routes";
 
 const links = [
-    { label: "Inicio", path: "/", icon: LayoutDashboard, end: true },
+    { label: "Inicio", path: DASHBOARD_PATH, icon: LayoutDashboard, end: true },
     { label: "Entreno", path: "/workouts", icon: Dumbbell },
     { label: "Comidas", path: "/meals", icon: UtensilsCrossed },
     { label: "Insights", path: "/insights", icon: Sparkles },
     { label: "Logros", path: "/achievements", icon: Trophy },
 ];
-
-function userInitial(name) {
-    const trimmed = name?.trim();
-    if (!trimmed) return "A";
-    return trimmed.charAt(0).toUpperCase();
-}
 
 export default function Sidebar({ open = false, onClose }) {
     const { user } = useAuth();
@@ -54,9 +49,17 @@ export default function Sidebar({ open = false, onClose }) {
                         <X size={18} aria-hidden="true" />
                     </button>
 
-                    <div className="sidebar-avatar" title={displayName} aria-label={displayName}>
+                    <NavLink
+                        to="/profile"
+                        onClick={onClose}
+                        title={`Perfil de ${displayName}`}
+                        aria-label={`Ir a perfil de ${displayName}`}
+                        className={({ isActive }) =>
+                            `sidebar-avatar touch-target ${isActive ? "sidebar-avatar--active" : ""}`
+                        }
+                    >
                         <img src={avatarSrc} alt={displayName} />
-                    </div>
+                    </NavLink>
 
                     <nav className="sidebar-nav">
                         {links.map((link) => {
@@ -80,20 +83,6 @@ export default function Sidebar({ open = false, onClose }) {
                             );
                         })}
                     </nav>
-
-                    <div className="sidebar-footer">
-                        <NavLink
-                            to="/profile"
-                            onClick={onClose}
-                            className="sidebar-profile touch-target"
-                            title={displayName}
-                            aria-label={`Ir a perfil de ${displayName}`}
-                        >
-                            <span className="sidebar-profile-avatar" aria-hidden="true">
-                                {userInitial(user?.name)}
-                            </span>
-                        </NavLink>
-                    </div>
                 </div>
             </aside>
         </>

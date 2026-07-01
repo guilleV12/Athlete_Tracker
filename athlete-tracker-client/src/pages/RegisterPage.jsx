@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { DASHBOARD_PATH } from "../lib/routes";
 import { useToast } from "../context/ToastContext";
 import { registerAndLogin } from "../services/authApi";
 import { getApiErrorMessage } from "../lib/apiError";
@@ -17,7 +18,7 @@ import PasswordField from "../components/ui/PasswordField";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user, token, loading: authLoading } = useAuth();
   const { success } = useToast();
   const [apiError, setApiError] = useState("");
 
@@ -36,6 +37,10 @@ export default function RegisterPage() {
     },
     mode: "onTouched",
   });
+
+  if (!authLoading && user && token) {
+    return <Navigate to={DASHBOARD_PATH} replace />;
+  }
 
   const onValidSubmit = async (formData) => {
     setApiError("");

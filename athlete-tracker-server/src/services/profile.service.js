@@ -2,9 +2,14 @@ import { prisma } from "../lib/prisma.js";
 import {
   buildNutritionPlan,
   calculateAgeFromBirthDate,
+  calculateMacros,
   NUTRITION_MODE_LABELS,
   ACTIVITY_LEVEL_LABELS,
 } from "../lib/nutrition/calorieTargets.js";
+import {
+  mapMacroTargets,
+  validateMacroTargetsInput,
+} from "../lib/nutrition/macros.js";
 import { checkAchievements } from "./achievement.service.js";
 
 const VALID_SEX = new Set(["male", "female"]);
@@ -56,6 +61,8 @@ function validateProfileInput(data) {
     throw new Error("Modo nutricional inválido");
   }
 
+  const macroTargets = validateMacroTargetsInput(data);
+
   return {
     birthDate,
     sex,
@@ -63,6 +70,7 @@ function validateProfileInput(data) {
     heightCm,
     activityLevel,
     nutritionMode,
+    macroTargets,
   };
 }
 
@@ -107,6 +115,16 @@ async function createWeightLogIfChanged(userId, weightKg, previousWeightKg) {
 }
 
 function mapProfileResponse(profile, computed) {
+  const macroTargets = mapMacroTargets(profile);
+  const suggestedMacros =
+    profile.targetCalories != null && profile.nutritionMode !== "intuitive"
+      ? calculateMacros({
+          targetCalories: profile.targetCalories,
+          weightKg: profile.weightKg,
+          nutritionMode: profile.nutritionMode,
+        })
+      : null;
+
   return {
     profile: {
       birthDate: profile.birthDate.toISOString(),
@@ -119,6 +137,7 @@ function mapProfileResponse(profile, computed) {
       nutritionModeLabel: NUTRITION_MODE_LABELS[profile.nutritionMode],
       profileCompleted: profile.profileCompleted,
       updatedAt: profile.updatedAt.toISOString(),
+      macroTargets,
     },
     computed: {
       age: computed.age,
@@ -126,6 +145,7 @@ function mapProfileResponse(profile, computed) {
       tdee: profile.tdee,
       targetCalories: profile.targetCalories,
       calorieAdjustment: computed.calorieAdjustment,
+      suggestedMacros,
     },
   };
 }
@@ -171,6 +191,18 @@ export async function upsertUserProfile(userId, data) {
     select: { weightKg: true },
   });
 
+  const macroData = input.macroTargets
+    ? {
+        targetProteinG: input.macroTargets.targetProteinG,
+        targetCarbsG: input.macroTargets.targetCarbsG,
+        targetFatG: input.macroTargets.targetFatG,
+      }
+    : {
+        targetProteinG: null,
+        targetCarbsG: null,
+        targetFatG: null,
+      };
+
   const profile = await prisma.userProfile.upsert({
     where: { userId },
     create: {
@@ -184,6 +216,7 @@ export async function upsertUserProfile(userId, data) {
       bmr: computed.bmr,
       tdee: computed.tdee,
       targetCalories: computed.targetCalories,
+      ...macroData,
       profileCompleted: true,
     },
     update: {
@@ -196,6 +229,7 @@ export async function upsertUserProfile(userId, data) {
       bmr: computed.bmr,
       tdee: computed.tdee,
       targetCalories: computed.targetCalories,
+      ...macroData,
       profileCompleted: true,
     },
   });

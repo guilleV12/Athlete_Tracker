@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { DASHBOARD_PATH } from "../lib/routes";
 import { useToast } from "../context/ToastContext";
 import { loginRequest } from "../services/authApi";
 import { getApiErrorMessage } from "../lib/apiError";
@@ -16,7 +17,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const passwordResetDone = location.state?.passwordReset === true;
-  const { login } = useAuth();
+  const { login, user, token, loading: authLoading } = useAuth();
   const { success } = useToast();
   const [apiError, setApiError] = useState("");
 
@@ -29,6 +30,10 @@ export default function LoginPage() {
     defaultValues: { email: "", password: "" },
     mode: "onTouched",
   });
+
+  if (!authLoading && user && token) {
+    return <Navigate to={DASHBOARD_PATH} replace />;
+  }
 
   const onValidSubmit = async ({ email, password }) => {
     setApiError("");

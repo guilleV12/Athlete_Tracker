@@ -11,6 +11,8 @@ function formatDate(value) {
 
 export default function MealCard({ meal }) {
     const dateLabel = formatDate(meal.date);
+    const hasMacros =
+        meal.proteinG != null || meal.carbsG != null || meal.fatG != null;
 
     return (
         <article className="quest-card card-interactive flex h-full flex-col gap-3 p-6 pt-7 text-start">
@@ -25,13 +27,26 @@ export default function MealCard({ meal }) {
                 ) : null}
             </header>
 
-            <dl className="text-sm">
-                <dt className="text-xs uppercase tracking-wide text-[var(--text)]">
-                    Calorías
-                </dt>
-                <dd className="font-medium text-[var(--text-h)]">
-                    {meal.calories} kcal
-                </dd>
+            <dl className="space-y-2 text-sm">
+                <div>
+                    <dt className="text-xs uppercase tracking-wide text-[var(--text)]">
+                        Calorías
+                    </dt>
+                    <dd className="font-medium text-[var(--text-h)]">
+                        {meal.calories} kcal
+                    </dd>
+                </div>
+                {hasMacros ? (
+                    <div>
+                        <dt className="text-xs uppercase tracking-wide text-[var(--text)]">
+                            Macros
+                        </dt>
+                        <dd className="font-medium text-[var(--text-h)]">
+                            P {meal.proteinG ?? 0} g · C {meal.carbsG ?? 0} g · G{" "}
+                            {meal.fatG ?? 0} g
+                        </dd>
+                    </div>
+                ) : null}
             </dl>
         </article>
     );

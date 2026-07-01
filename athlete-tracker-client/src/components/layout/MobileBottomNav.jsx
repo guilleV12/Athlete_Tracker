@@ -7,9 +7,11 @@ import {
     UtensilsCrossed,
 } from "lucide-react";
 
+import { DASHBOARD_PATH } from "../../lib/routes";
+
 const tabs = [
     {
-        path: "/",
+        path: DASHBOARD_PATH,
         end: true,
         icon: LayoutDashboard,
         ariaLabel: "Inicio",

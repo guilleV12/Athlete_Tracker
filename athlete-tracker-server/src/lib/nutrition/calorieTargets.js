@@ -48,6 +48,42 @@ export function calculateTargetCalories({ tdee, nutritionMode }) {
   return { targetCalories, calorieAdjustment };
 }
 
+/** Gramos de proteína por kg según objetivo (orientativo). */
+const PROTEIN_G_PER_KG = {
+  deficit: 2.0,
+  maintenance: 1.6,
+  surplus: 1.8,
+};
+
+/**
+ * Reparto orientativo P/C/G desde kcal meta:
+ * proteína por peso, ~25 % grasa, resto carbohidratos.
+ */
+export function calculateMacros({ targetCalories, weightKg, nutritionMode }) {
+  if (targetCalories == null || nutritionMode === "intuitive") {
+    return null;
+  }
+
+  const proteinPerKg = PROTEIN_G_PER_KG[nutritionMode] ?? 1.6;
+  const proteinG = Math.round(weightKg * proteinPerKg);
+  const proteinKcal = proteinG * 4;
+
+  const fatKcal = Math.round(targetCalories * 0.25);
+  const fatG = Math.round(fatKcal / 9);
+
+  const carbKcal = Math.max(0, targetCalories - proteinKcal - fatKcal);
+  const carbsG = Math.round(carbKcal / 4);
+
+  return {
+    proteinG,
+    fatG,
+    carbsG,
+    proteinPct: Math.round((proteinG * 4) / targetCalories * 100),
+    fatPct: Math.round((fatG * 9) / targetCalories * 100),
+    carbsPct: Math.round((carbsG * 4) / targetCalories * 100),
+  };
+}
+
 export function buildNutritionPlan(profileInput) {
   const age = calculateAgeFromBirthDate(profileInput.birthDate);
   const bmr = calculateBmr({

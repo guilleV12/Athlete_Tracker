@@ -1,17 +1,21 @@
 import { LogOut, Menu } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import ThemeToggle from "../ui/ThemeToggle";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
+import { LANDING_PATH } from "../../lib/routes";
 
 const APP_NAME = "Athlete Tracker";
 
 export default function Navbar({ onMenuClick }) {
     const { user, logout } = useAuth();
     const { info } = useToast();
+    const navigate = useNavigate();
 
     const handleLogout = () => {
         logout();
         info("Sesión cerrada.");
+        navigate(LANDING_PATH);
     };
 
     const today = new Date().toLocaleDateString("es-ES", {
@@ -60,7 +64,7 @@ export default function Navbar({ onMenuClick }) {
                         className="btn-press btn-secondary touch-target inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm sm:px-4 sm:text-base"
                     >
                         <LogOut size={16} aria-hidden="true" />
-                        <span className="hidden sm:inline">Logout</span>
+                        <span className="hidden sm:inline">Salir</span>
                     </button>
                 </div>
             </div>
