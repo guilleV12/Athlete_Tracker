@@ -116,7 +116,7 @@ Credenciales demo: `demo@athlete-tracker.dev` / `Demo1234`
 | "No se pudo conectar con el servidor" | Ver filas de abajo. |
 | Build `exited with 127` | Vercel → Settings → **Build Command vacío**. Root Directory = `.`. Redeploy. |
 | `No Output Directory named "dist"` | Root Directory = `.` (raíz). Output Directory **vacío** en dashboard. Redeploy. |
-| `/api/v1/health` devuelve HTML o "No routes matched" | Redeploy con `api/[[...path]].js` en la raíz. Root Directory = `.`. |
+| `/api/v1/health` devuelve HTML o "No routes matched" | Redeploy con `api/index.js` + rewrites en `vercel.json`. Root Directory = `.`. |
 | Requests a `localhost:3000` | Redeploy en Vercel (build viejo). El cliente ya usa `/api/v1` en prod. |
 | 500 en `/api/v1/*` | Revisá `TURSO_*`, `JWT_SECRET` y logs en Vercel → Functions. |
 | Turso 401 / tablas vacías | Regenerá el token en Turso (`turso db tokens create`) y corré `npm run db:sync:turso` + `npm run seed`. |
