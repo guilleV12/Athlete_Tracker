@@ -121,7 +121,7 @@ Credenciales demo: `demo@athlete-tracker.dev` / `Demo1234`
 | Requests a `localhost:3000` | Redeploy en Vercel (build viejo). El cliente ya usa `/api/v1` en prod. |
 | 500 en `/api/v1/*` | Revisá `TURSO_*`, `JWT_SECRET` y logs en Vercel → Functions. |
 | Turso 401 / tablas vacías | Regenerá el token en Turso (`turso db tokens create`) y corré `npm run db:sync:turso` + `npm run seed`. |
-| Prisma client error | El build ejecuta `prisma generate` vía `postinstall` del server. |
+| Build falla: `Missing required environment variable: DATABASE_URL` | Ya corregido en `prisma.config.ts` (fallback en build). Redeploy. En runtime sí necesitás `TURSO_*`. |
 | CORS | Con mismo dominio no debería aparecer. Si usás dominio custom, actualizá `FRONTEND_URL`. |
 
 ---
