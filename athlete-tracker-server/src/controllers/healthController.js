@@ -18,11 +18,27 @@ export function getRoot(_req, res) {
  * @param {import('express').Response} res
  */
 export async function getHealth(_req, res) {
+  const tursoConfigured = Boolean(
+    process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN
+  );
   const started = Date.now();
-  await prisma.$queryRaw`SELECT 1`;
-  res.json({
-    status: "ok",
-    database: "connected",
-    responseMs: Date.now() - started,
-  });
+
+  try {
+    await prisma.$queryRawUnsafe("SELECT 1");
+    res.json({
+      status: "ok",
+      database: "connected",
+      tursoConfigured,
+      responseMs: Date.now() - started,
+    });
+  } catch {
+    res.status(503).json({
+      status: "error",
+      database: "disconnected",
+      tursoConfigured,
+      hint: tursoConfigured
+        ? "Token Turso inválido o tablas sin crear. Regenerá un token con permiso de escritura y corré npm run db:sync:turso + npm run seed."
+        : "Configurá TURSO_DATABASE_URL y TURSO_AUTH_TOKEN en Vercel → Environment Variables.",
+    });
+  }
 }

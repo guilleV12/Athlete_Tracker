@@ -6,7 +6,7 @@
 export function getApiErrorMessage(error, fallback) {
   if (!error?.response) {
     if (error?.code === "ERR_NETWORK") {
-      return "No se pudo conectar con el servidor. Revisá que la API esté deployada en Vercel (Root Directory = raíz del repo) y que las variables TURSO_* y JWT_SECRET estén configuradas.";
+      return "No se pudo conectar con el servidor. Si acabás de deployar, esperá unos segundos y recargá. Revisá que no tengas VITE_API_URL apuntando a localhost en Vercel.";
     }
     return fallback;
   }

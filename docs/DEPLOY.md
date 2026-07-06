@@ -31,12 +31,14 @@ Repo: `https://github.com/guilleV12/Athlete_Tracker`
 
 1. Creá cuenta en [turso.tech](https://turso.tech) (gratis).
 2. Instalá la CLI (opcional pero útil): [docs.turso.tech/cli](https://docs.turso.tech/cli).
-3. Creá la base:
+3. Creá la base y un token **con permiso de lectura y escritura** (no read-only):
 
 ```bash
 turso db create athlete-tracker
-turso db tokens create athlete-tracker
+turso db tokens create athlete-tracker --read-write
 ```
+
+> Si el token es solo lectura, `db:sync:turso` falla con `SQL write operations are forbidden`.
 
 4. Copiá:
    - **URL** → `TURSO_DATABASE_URL` (formato `libsql://...`)
@@ -84,7 +86,7 @@ Credenciales demo: `demo@athlete-tracker.dev` / `Demo1234`
 | `TURSO_AUTH_TOKEN` | Token de Turso |
 | `FRONTEND_URL` | URL de Vercel, ej. `https://athlete-tracker-gray.vercel.app` |
 
-**No hace falta** `VITE_API_URL` en producción: el cliente usa `/api/v1` (mismo dominio, sin CORS).
+**No agregues** `VITE_API_URL` en Vercel (si existe, borrala). El cliente usa `/api/v1` en el mismo dominio.
 
 4. **Deploy**.
 
