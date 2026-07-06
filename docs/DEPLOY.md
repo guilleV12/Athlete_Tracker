@@ -65,13 +65,14 @@ Credenciales demo: `demo@athlete-tracker.dev` / `Demo1234`
 
 | Campo | Valor |
 |--------|--------|
-| Root Directory | `.` (raíz del repo, **no** `athlete-tracker-client`) |
+| Root Directory | `athlete-tracker-client` |
 | Framework Preset | **Other** |
 | Build Command | **vacío** |
 | Install Command | **vacío** |
-| Output Directory | **vacío** (Vercel usa `dist` vía `vercel.json`) |
+| Output Directory | **vacío** |
 
-> Si ves `exited with 127` o `No Output Directory named "dist"`, borrá overrides viejos en el dashboard y asegurate que Root Directory sea `.`.
+> Usa el `vercel.json` dentro de `athlete-tracker-client/` (incluye API + SPA).
+> Alternativa: Root Directory `.` y el `vercel.json` de la raíz del repo.
 
 3. **Environment Variables** (Production):
 
@@ -116,7 +117,7 @@ Credenciales demo: `demo@athlete-tracker.dev` / `Demo1234`
 | "No se pudo conectar con el servidor" | Ver filas de abajo. |
 | Build `exited with 127` | Vercel → Settings → **Build Command vacío**. Root Directory = `.`. Redeploy. |
 | `No Output Directory named "dist"` | Root Directory = `.` (raíz). Output Directory **vacío** en dashboard. Redeploy. |
-| `/api/v1/health` devuelve HTML o "No routes matched" | Redeploy con `api/index.js` + rewrites en `vercel.json`. Root Directory = `.`. |
+| `/api/v1/health` devuelve HTML o "No routes matched" | Root Directory = `athlete-tracker-client` (con `api/` y `vercel.json` ahí). Build/Output vacíos en dashboard. Redeploy. |
 | Requests a `localhost:3000` | Redeploy en Vercel (build viejo). El cliente ya usa `/api/v1` en prod. |
 | 500 en `/api/v1/*` | Revisá `TURSO_*`, `JWT_SECRET` y logs en Vercel → Functions. |
 | Turso 401 / tablas vacías | Regenerá el token en Turso (`turso db tokens create`) y corré `npm run db:sync:turso` + `npm run seed`. |

@@ -1,14 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "npm install",
-  "buildCommand": "npm run build",
-  "outputDirectory": "athlete-tracker-client/dist",
+  "installCommand": "npm install && npm install --prefix ../athlete-tracker-server",
+  "buildCommand": "npm run postinstall --prefix ../athlete-tracker-server && npm run build",
+  "outputDirectory": "dist",
   "functions": {
     "api/index.js": {
       "maxDuration": 30,
       "memory": 1024,
-      "includeFiles": "athlete-tracker-server/prisma/**"
+      "includeFiles": "../athlete-tracker-server/prisma/**"
     }
   },
   "rewrites": [
